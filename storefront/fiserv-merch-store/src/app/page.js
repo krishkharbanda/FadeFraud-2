@@ -4,9 +4,10 @@ import { useState } from "react";
 import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import axios from 'axios';
 
 const products = [
-    { id: 1, name: "Fiserv T-Shirt", price: "24.99", image: "/tshirt.jpg" },
+    { id: 1, name: "Fiserv T-Shirt", price: "$24.99", image: "/tshirt.jpg" },
     { id: 2, name: "Fiserv Ladies T-Shirt", price: "$24.99", image: "/ladies-shirt.jpg" },
     { id: 3, name: "Fiserv Hat", price: "$26.99", image: "/hat.jpg" },
 ];
@@ -15,16 +16,26 @@ export default function Home() {
     const [showPopup, setShowPopup] = useState(false);
     const [buyingProduct, setBuyingProduct] = useState(null);
     const [bought, setBought] = useState(false);
+    const [response, setResponse] = useState(null);
 
     const handleBuyClick = (product) => {
         setBuyingProduct(product);
         setShowPopup(true);
     };
 
-    const confirmPurchase = () => {
+    const confirmPurchase = async () => {
         setShowPopup(false);
         setBought(true);
-        setTimeout(() => setBought(false), 2000); // Reset animation after 2 seconds
+        setTimeout(() => setBought(false), 2000);
+
+        try {
+            const res = await axios.post('http://127.0.0.1:8000/webhook', {
+                message: buyingProduct.name + "|" + buyingProduct.price,
+            });
+            setResponse(res.data.response);
+        } catch (error) {
+            console.error("Error sending data:", error);
+        }
     };
 
     return (
@@ -69,7 +80,6 @@ export default function Home() {
 
             <Footer />
 
-            {/* Confirmation Popup */}
             {showPopup && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                     <div className="bg-gray-700 p-6 rounded-lg shadow-lg text-center">
@@ -93,7 +103,6 @@ export default function Home() {
                 </div>
             )}
 
-            {/* Bought Animation */}
             {bought && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70">
                     <div className="text-white text-4xl font-bold animate-bounce">

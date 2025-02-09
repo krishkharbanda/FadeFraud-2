@@ -4,3 +4,7 @@ plaid
 python-dotenv
 requests
 pymongo
+pandas
+scikit-learn
+shap
+secure-smtplib
