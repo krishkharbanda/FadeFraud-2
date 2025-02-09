@@ -74,7 +74,7 @@ def product_form(message):
     print(f"Predicted Fraud Score: {fraud_score:.2f}%")
     print(f"Broken Rules: {broken_rules}")
     if fraud_score >= 70:
-        send_email()
+        send_email(fraud_score, broken_rules, transaction)
 
 
 import smtplib
@@ -91,18 +91,26 @@ SENDER_PASSWORD = os.getenv("EMAIL_PASSWORD")
 RECEIVER_EMAIL = os.getenv("EMAIL_RECEIVER")
 
 
-def send_email():
+def send_email(fraud_score, broken_rules, transaction):
     subject = "Fraud Alert: Suspicious Transaction Detected on your Card"
 
     body = f"""
-    Attention FadeFraud user,
+    Alert! A potentially fraudulent transaction has been detected.
 
-    Alert! A potentially fraudulent transaction has been detected on your card. Please check FadeFraud for further actions! Immediate action may be required.
+    **Fraud Score:** {fraud_score:.2f}%
+    **Broken Rules:** {broken_rules}
 
-    Regards,
-    The FadeFraud Team
+    **Transaction Details:**
+    IP Address: {transaction["IP Address"]}
+    Country: {transaction["Country"]}
+    Device ID: {transaction["Device ID"]}
+    Email: {transaction["Email"]}
+    Transaction Amount: ${transaction["Transaction Amount"]}
+    Transaction Pattern: {transaction["Transaction Pattern"]}
+    User Agent: {transaction["User Agent"]}
+    Activity Time: {transaction["Activity Time (s)"]} seconds
 
-    Please do not reply to this email. Check the website for more information.
+    Immediate action may be required.
     """
 
     msg = MIMEMultipart()
